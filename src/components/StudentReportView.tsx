@@ -143,7 +143,7 @@ export default function StudentReportView({ student }: { student: StudentData })
                       Total: {totalObtained} / {totalMax} ({pct}%) — Grade: {grade}
                     </span>
                   </div>
-                  <table className="w-full text-left text-sm">
+                  <table className="block w-full overflow-x-auto md:table w-full text-left text-sm">
                     <thead className="bg-white border-b text-xs uppercase text-gray-500">
                       <tr>
                         <th className="p-3">Subject</th>

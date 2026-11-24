@@ -12,14 +12,14 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between p-4">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
+      <aside className="w-full md:w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col justify-between p-4">
         <div>
           <div className="px-4 py-3 mb-6">
             <h1 className="text-xl font-bold text-blue-600">SchoolChalo</h1>
             <p className="text-xs text-gray-500">Admin Portal</p>
           </div>
-          <nav className="space-y-1">
+          <nav className="flex flex-wrap gap-1.5 md:block md:space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <LogoutButton />
         </div>
       </aside>
-      <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto min-w-0 overflow-x-hidden">{children}</main>
     </div>
   );
 }

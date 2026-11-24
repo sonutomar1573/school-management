@@ -12,7 +12,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
           <LogoutButton />
         </div>
       </header>
-      <main className="max-w-5xl mx-auto p-6">{children}</main>
+      <main className="max-w-5xl mx-auto p-4 md:p-6 min-w-0 overflow-x-hidden">{children}</main>
     </div>
   );
 }

@@ -149,7 +149,7 @@ export default function StudentsPage() {
       </form>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        <table className="block w-full overflow-x-auto md:table w-full text-left border-collapse">
           <thead className="bg-gray-50 border-b text-xs uppercase text-gray-500">
             <tr>
               <th className="p-4">Roll No</th>

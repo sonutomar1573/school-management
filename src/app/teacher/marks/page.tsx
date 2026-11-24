@@ -106,7 +106,7 @@ export default function TeacherMarksPage() {
       {savedMsg && <div className="mb-4 p-3 text-sm text-green-700 bg-green-50 rounded-lg border border-green-200">{savedMsg}</div>}
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        <table className="block w-full overflow-x-auto md:table w-full text-left border-collapse">
           <thead className="bg-gray-50 border-b text-xs uppercase text-gray-500">
             <tr>
               <th className="p-4">Roll No</th>
