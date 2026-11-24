@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+// 1. User Access & Login
+model User {
+  id           String   @id @default(cuid())
+  identifier   String   @unique // Email for Admin/Teacher, Mobile for Parent, Roll/ID for Student
+  passwordHash String
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  teacher      Teacher?
+  student      Student?
+  parent       Parent?
+}
+
+// 3. Class & Section Management
+model Class {
+  id       String    @id @default(cuid())
+  name     String    @unique // e.g., "Class 1", "Class 10"
+  sections Section[]
+  subjects Subject[]
+  students Student[]
+}
+
+model Section {
+  id             String       @id @default(cuid())
+  name           String       // e.g., "A", "B", "C"
+  classId        String
+  class          Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classTeacherId String?
+  classTeacher   Teacher?     @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+  students       Student[]
+  attendance     Attendance[]
+
+  @@unique([classId, name])
+}
+
+// 7. Teacher Module
+model Teacher {
+  id                    String       @id @default(cuid())
+  userId                String       @unique
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                  String
+  mobile                String       @unique
+  subjectSpecialization String?
+  isDeleted             Boolean      @default(false)
+
+  assignedSections      Section[]    @relation("ClassTeacher")
+  subjects              Subject[]
+  markedAttendance      Attendance[]
+}
+
+// 4. Parent Module
+model Parent {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name     String
+  mobile   String    @unique
+  students Student[]
+}
+
+// 2. Student Management Module
+model Student {
+  id         String       @id @default(cuid())
+  userId     String       @unique
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rollNumber String
+  name       String
+  dob        DateTime?
+  address    String?
+  photoUrl   String?
+  isDeleted  Boolean      @default(false)
+
+  classId    String
+  class      Class        @relation(fields: [classId], references: [id])
+  sectionId  String
+  section    Section      @relation(fields: [sectionId], references: [id])
+  parentId   String
+  parent     Parent       @relation(fields: [parentId], references: [id])
+
+  attendance Attendance[]
+  marks      Mark[]
+
+  // Roll Number + Class + Section = Unique Identity
+  @@unique([classId, sectionId, rollNumber])
+}
+
+model Subject {
+  id        String   @id @default(cuid())
+  name      String   // e.g., "Mathematics", "Science"
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacherId String?
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  marks     Mark[]
+
+  @@unique([classId, name])
+}
+
+// 5. Attendance Management
+model Attendance {
+  id         String           @id @default(cuid())
+  date       DateTime         @db.Date
+  status     AttendanceStatus @default(PRESENT)
+
+  studentId  String
+  student    Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sectionId  String
+  section    Section          @relation(fields: [sectionId], references: [id])
+  markedById String
+  markedBy   Teacher          @relation(fields: [markedById], references: [id])
+
+  @@unique([studentId, date]) // Prevents duplicate attendance on the same day
+}
+
+// 6. Exam, Result & Marks Module
+model Exam {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Unit Test 1", "Mid-Term 2026"
+  startDate   DateTime
+  endDate     DateTime
+  isPublished Boolean  @default(false)
+  marks       Mark[]
+}
+
+model Mark {
+  id            String  @id @default(cuid())
+  marksObtained Float
+  maxMarks      Float   @default(100)
+
+  examId        String
+  exam          Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId     String
+  subject       Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentId, subjectId])
+}
